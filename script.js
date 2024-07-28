@@ -23,7 +23,10 @@ async function loadData() {
             console.error('Data loading failed.');
             return;
         }
-    
+        const titleText = scene === 0 ? "GDP and Income Comparison"
+                      : scene === 1 ? "GDP and Life Expectancy Comparison"
+                      : "GDP and Population Comparison";
+        document.getElementById("scene-title").innerText = titleText;
         // Parse the data
         gdpData.forEach(d => d.year = +d.year);
         incomeData.forEach(d => d.year = +d.year);
@@ -31,9 +34,9 @@ async function loadData() {
         popData.forEach(d => d.year = +d.year);
     
         // Set up the SVG canvas dimensions
-        const margin = { top: 20, right: 30, bottom: 50, left: 60 };
+        const margin = { top: 20, right: 80, bottom: 50, left: 60 };
         const width = 960 - margin.left - margin.right;
-        const height = 500 - margin.top - margin.bottom;
+        const height = 400 - margin.top - margin.bottom;
     
         // Clear previous visualization
         d3.select("#visualization").html("");
