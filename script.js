@@ -1,8 +1,8 @@
 async function loadData() {
-    const gdpData = await d3.csv('gdp.csv');
-    const incomeData = await d3.csv('income.csv');
-    const lexData = await d3.csv('lex.csv');
-    const popData = await d3.csv('pop.csv');
+    const gdpData = await d3.csv('https://raw.githubusercontent.com/jlee588/jlee588.github.io/main/gdp.csv');
+    const incomeData = await d3.csv('https://raw.githubusercontent.com/jlee588/jlee588.github.io/main/income.csv');
+    const lexData = await d3.csv('https://raw.githubusercontent.com/jlee588/jlee588.github.io/main/lex.csv');
+    const popData = await d3.csv('https://raw.githubusercontent.com/jlee588/jlee588.github.io/main/pop.csv');
     
     return { gdpData, incomeData, lexData, popData };
 }
