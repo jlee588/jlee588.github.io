@@ -174,7 +174,7 @@ async function loadData() {
                     note: { label: "From 1900 to 1960, life expectancy increased from 50 to 70, but growth to life expectancy slowed down since then", title: "Year 1960" },
                     data: { year: 1960, value: 70.1 }, 
                     dx: 50,
-                    dy: 200
+                    dy: 100
                 }
             ],
             2: [
@@ -182,7 +182,7 @@ async function loadData() {
                     note: { label: "Population grew steadily with growth to GDP", title: "Year 2020" },
                     data: { year: 1945, value: 136000000 },
                     dx: 50,
-                    dy: -70
+                    dy: -90
                 }
             ]
         };
