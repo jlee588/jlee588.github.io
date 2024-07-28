@@ -37,7 +37,7 @@ async function loadData() {
     
         // Clear previous visualization
         d3.select("#visualization").html("");
-    
+
         const svg = d3.select("#visualization")
             .append("svg")
             .attr("width", width + margin.left + margin.right)
@@ -67,59 +67,66 @@ async function loadData() {
     
         // Add the x-axis
         svg.append("g")
-            .attr("transform", `translate(0,${height})`)
-            .call(d3.axisBottom(x).tickFormat(d3.format("d")));
-    
+        .attr("class", "x-axis")
+        .attr("transform", `translate(0,${height})`)
+        .call(d3.axisBottom(x).tickFormat(d3.format("d")));
+
         // Add the y-axis for GDP
         svg.append("g")
-            .call(d3.axisLeft(yGDP))
-            .append("text")
-            .attr("fill", "#000")
-            .attr("transform", "rotate(-90)")
-            .attr("y", -50)
-            .attr("dy", "0.71em")
-            .attr("text-anchor", "end")
-            .text("GDP");
-    
+        .attr("class", "y-axis-left")
+        .call(d3.axisLeft(yGDP))
+        .append("text")
+        .attr("fill", "#000")
+        .attr("transform", "rotate(-90)")
+        .attr("y", -50)
+        .attr("dy", "0.71em")
+        .attr("text-anchor", "end")
+        .text("GDP");
+
         // Add the y-axis for secondary metric
         svg.append("g")
-            .attr("transform", `translate(${width},0)`)
-            .call(d3.axisRight(ySecondary))
-            .append("text")
-            .attr("fill", "#000")
-            .attr("transform", "rotate(-90)")
-            .attr("y", 40)
-            .attr("dy", "0.71em")
-            .attr("text-anchor", "end")
-            .text(scene === 0 ? "Income" : scene === 1 ? "Life Expectancy" : "Population");
-    
+        .attr("class", "y-axis-right")
+        .attr("transform", `translate(${width},0)`)
+        .call(d3.axisRight(ySecondary))
+        .append("text")
+        .attr("fill", "#000")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 40)
+        .attr("dy", "0.71em")
+        .attr("text-anchor", "end")
+        .text(scene === 0 ? "Income" : scene === 1 ? "Life Expectancy" : "Population");
+
         // Line generators
         const lineGDP = d3.line()
-            .x(d => x(d.year))
-            .y(d => yGDP(d.gdp));
-    
+        .x(d => x(d.year))
+        .y(d => yGDP(d.gdp))
+        .curve(d3.curveMonotoneX); // Smooth line
+
         const lineSecondary = d3.line()
-            .x(d => x(d.year))
-            .y(d => {
-                if (scene === 0) return ySecondary(incomeData.find(e => e.year === d.year)?.income);
-                if (scene === 1) return ySecondary(lexData.find(e => e.year === d.year)?.life_expectancy);
-                if (scene === 2) return ySecondary(popData.find(e => e.year === d.year)?.population);
-            });
-    
+        .x(d => x(d.year))
+        .y(d => {
+            if (scene === 0) return ySecondary(incomeData.find(e => e.year === d.year)?.income);
+            if (scene === 1) return ySecondary(lexData.find(e => e.year === d.year)?.life_expectancy);
+            if (scene === 2) return ySecondary(popData.find(e => e.year === d.year)?.population);
+        })
+        .curve(d3.curveMonotoneX); // Smooth line
+
         // Add the lines
         svg.append("path")
-            .datum(gdpData)
-            .attr("fill", "none")
-            .attr("stroke", "steelblue")
-            .attr("stroke-width", 1.5)
-            .attr("d", lineGDP);
-    
+        .datum(gdpData)
+        .attr("class", "line-gdp")
+        .attr("fill", "none")
+        .attr("stroke", "steelblue")
+        .attr("stroke-width", 1.5)
+        .attr("d", lineGDP);
+
         svg.append("path")
-            .datum(gdpData)
-            .attr("fill", "none")
-            .attr("stroke", scene === 0 ? "green" : scene === 1 ? "red" : "orange")
-            .attr("stroke-width", 1.5)
-            .attr("d", lineSecondary);
+        .datum(gdpData)
+        .attr("class", "line-secondary")
+        .attr("fill", "none")
+        .attr("stroke", scene === 0 ? "green" : scene === 1 ? "red" : "orange")
+        .attr("stroke-width", 1.5)
+        .attr("d", lineSecondary);
     
         // Add interactivity and annotations
         const focus = svg.append("g")
@@ -150,10 +157,9 @@ async function loadData() {
             const d0 = gdpData[i - 1];
             const d1 = gdpData[i];
             const d = x0 - d0.year > d1.year - x0 ? d1 : d0;
-    
+        
             focus.attr("transform", `translate(${x(d.year)},${yGDP(d.gdp)})`);
-            focus.select("text").text(d.gdp);
-    
+            
             let secondaryValue;
             if (scene === 0) {
                 secondaryValue = incomeData.find(e => e.year === d.year)?.income;
@@ -162,8 +168,8 @@ async function loadData() {
             } else if (scene === 2) {
                 secondaryValue = popData.find(e => e.year === d.year)?.population;
             }
-    
-            d3.select("#annotationText").text(`Year: ${d.year}, GDP: ${d.gdp}, ${scene === 0 ? "Income" : scene === 1 ? "Life Expectancy" : "Population"}: ${secondaryValue}`);
+        
+            focus.select("text").text(`GDP: ${d.gdp}, ${scene === 0 ? "Income" : scene === 1 ? "Life Expectancy" : "Population"}: ${secondaryValue}`);
         }
     
         // Navigation functionality
@@ -185,5 +191,31 @@ async function loadData() {
         };
     }
     
-    // Initialize the visualization
+    const zoom = d3.zoom()
+    .scaleExtent([1, 10]) // Set the zoom scale extent
+    .translateExtent([[0, 0], [width, height]]) // Set the translation extent
+    .extent([[0, 0], [width, height]]) // Set the zoomable extent
+    .on("zoom", zoomed);
+
+    svg.call(zoom);
+
+    function zoomed(event) {
+        const transform = event.transform;
+        const newX = transform.rescaleX(x);
+        const newYGDP = transform.rescaleY(yGDP);
+
+        svg.selectAll(".x-axis").call(d3.axisBottom(newX));
+        svg.selectAll(".y-axis-left").call(d3.axisLeft(newYGDP));
+
+        svg.selectAll(".line-gdp")
+            .attr("d", lineGDP.x(d => newX(d.year)).y(d => newYGDP(d.gdp)));
+
+        svg.selectAll(".line-secondary")
+            .attr("d", lineSecondary.x(d => newX(d.year)).y(d => {
+                if (scene === 0) return ySecondary(incomeData.find(e => e.year === d.year)?.income);
+                if (scene === 1) return ySecondary(lexData.find(e => e.year === d.year)?.life_expectancy);
+                if (scene === 2) return ySecondary(popData.find(e => e.year === d.year)?.population);
+            }));
+    }
+
     drawVisualization();
