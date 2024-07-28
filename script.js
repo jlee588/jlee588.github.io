@@ -26,6 +26,7 @@ async function loadData() {
         const titleText = scene === 0 ? "GDP and Income Comparison"
                       : scene === 1 ? "GDP and Life Expectancy Comparison"
                       : "GDP and Population Comparison";
+
         document.getElementById("scene-title").innerText = titleText;
         // Parse the data
         gdpData.forEach(d => d.year = +d.year);
@@ -158,7 +159,54 @@ async function loadData() {
         .attr("stroke", scene === 0 ? "green" : scene === 1 ? "red" : "orange")
         .attr("stroke-width", 1.5)
         .attr("d", lineSecondary);
+        
+        const annotations = {
+            0: [
+                {
+                    note: { label: "From year 1980, growth in GDP and daily income starts to deviate", title: "Year 2000" },
+                    data: { year: 1980, value: 50.5 }, 
+                    dx: 50,
+                    dy: -30
+                }
+            ],
+            1: [
+                {
+                    note: { label: "From 1900 to 1960, life expectancy increased from 50 to 70, but growth to life expectancy slowed down since then", title: "Year 2010" },
+                    data: { year: 1960, value: 70.1 }, 
+                    dx: 50,
+                    dy: -30
+                }
+            ],
+            2: [
+                {
+                    note: { label: "Population grew steadily with growth to GDP", title: "Year 2020" },
+                    data: { year: 1945, value: 136000000 },
+                    dx: 50,
+                    dy: -30
+                }
+            ]
+        };
     
+        const annotationData = annotations[scene].map(d => ({
+            note: {
+                label: d.note.label,
+                title: d.note.title,
+                wrap: 200
+            },
+            x: x(d.data.year),
+            y: scene === 0 ? ySecondary(d.data.value) : scene === 1 ? ySecondary(d.data.value) : ySecondary(d.data.value),
+            dx: d.dx,
+            dy: d.dy,
+            subject: { radius: 5, radiusPadding: 2 }
+        }));
+    
+        const makeAnnotations = d3.annotation()
+            .type(d3.annotationCalloutCircle)
+            .annotations(annotationData);
+    
+        svg.append("g")
+            .attr("class", "annotation-group")
+            .call(makeAnnotations);
         // Add interactivity and annotations
         const focus = svg.append("g")
             .attr("class", "focus")
