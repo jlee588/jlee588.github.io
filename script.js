@@ -27,7 +27,14 @@ async function loadData() {
                       : scene === 1 ? "GDP and Life Expectancy Comparison"
                       : "GDP and Population Comparison";
 
+        const narratives = [
+        "In this scene, we compare GDP and daily income over time. Notice how the income growth rate starts deviating from the GDP growth rate around the year 1980.",
+        "This scene highlights the relationship between GDP and Life Expectancy. Observe how life expectancy has steadily increased as GDP has grown, from 1900 to 1960.",
+        "In this scene, we examine the correlation between GDP and Population growth. The population has grown steadily with GDP over the years."
+        ];
+
         document.getElementById("scene-title").innerText = titleText;
+        document.getElementById("narrativeText").innerText = narratives[scene];
         // Parse the data
         gdpData.forEach(d => d.year = +d.year);
         incomeData.forEach(d => d.year = +d.year);
