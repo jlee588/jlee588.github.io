@@ -1,17 +1,29 @@
 async function loadData() {
-    const gdpData = await d3.csv('https://raw.githubusercontent.com/jlee588/jlee588.github.io/main/gdp.csv');
-    const incomeData = await d3.csv('https://raw.githubusercontent.com/jlee588/jlee588.github.io/main/income.csv');
-    const lexData = await d3.csv('https://raw.githubusercontent.com/jlee588/jlee588.github.io/main/lex.csv');
-    const popData = await d3.csv('https://raw.githubusercontent.com/jlee588/jlee588.github.io/main/pop.csv');
+    try {
+        const gdpData = await d3.csv('https://raw.githubusercontent.com/jlee588/jlee588.github.io/main/gdp.csv');
+        const incomeData = await d3.csv('https://raw.githubusercontent.com/jlee588/jlee588.github.io/main/income.csv');
+        const lexData = await d3.csv('https://raw.githubusercontent.com/jlee588/jlee588.github.io/main/lex.csv');
+        const popData = await d3.csv('https://raw.githubusercontent.com/jlee588/jlee588.github.io/main/pop.csv');
     
-    return { gdpData, incomeData, lexData, popData };
-}
+        console.log('GDP Data:', gdpData);
+        console.log('Income Data:', incomeData);
+        console.log('Life Expectancy Data:', lexData);
+        console.log('Population Data:', popData);
+
+        return { gdpData, incomeData, lexData, popData };
+    } catch (error) {
+            console.error('Error loading data:', error);
+        }
+    }
 
 
 async function drawVisualization() {
     const { gdpData, incomeData, lexData, popData } = await loadData();
 
-
+    if (!gdpData || !incomeData || !lexData || !popData) {
+        console.error('Data loading failed.');
+        return;
+    }
     gdpData.forEach(d => d.year = +d.year);
     incomeData.forEach(d => d.year = +d.year);
     lexData.forEach(d => d.year = +d.year);
