@@ -163,18 +163,18 @@ async function loadData() {
         const annotations = {
             0: [
                 {
-                    note: { label: "From year 1980, growth in GDP and daily income starts to deviate", title: "Year 2000" },
+                    note: { label: "From year 1980, growth in GDP and daily income starts to deviate", title: "Year 1980" },
                     data: { year: 1980, value: 50.5 }, 
                     dx: 50,
-                    dy: -30
+                    dy: 60
                 }
             ],
             1: [
                 {
-                    note: { label: "From 1900 to 1960, life expectancy increased from 50 to 70, but growth to life expectancy slowed down since then", title: "Year 2010" },
+                    note: { label: "From 1900 to 1960, life expectancy increased from 50 to 70, but growth to life expectancy slowed down since then", title: "Year 1960" },
                     data: { year: 1960, value: 70.1 }, 
                     dx: 50,
-                    dy: -30
+                    dy: 200
                 }
             ],
             2: [
@@ -182,7 +182,7 @@ async function loadData() {
                     note: { label: "Population grew steadily with growth to GDP", title: "Year 2020" },
                     data: { year: 1945, value: 136000000 },
                     dx: 50,
-                    dy: -30
+                    dy: -70
                 }
             ]
         };
