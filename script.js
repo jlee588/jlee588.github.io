@@ -23,7 +23,7 @@ async function loadData() {
             console.error('Data loading failed.');
             return;
         }
-        const titleText = scene === 0 ? "GDP and Income Comparison"
+        const titleText = scene === 0 ? "GDP and Daily Income Comparison"
                       : scene === 1 ? "GDP and Life Expectancy Comparison"
                       : "GDP and Population Comparison";
 
@@ -35,18 +35,16 @@ async function loadData() {
 
         document.getElementById("scene-title").innerText = titleText;
         document.getElementById("narrativeText").innerText = narratives[scene];
-        // Parse the data
+
         gdpData.forEach(d => d.year = +d.year);
         incomeData.forEach(d => d.year = +d.year);
         lexData.forEach(d => d.year = +d.year);
         popData.forEach(d => d.year = +d.year);
     
-        // Set up the SVG canvas dimensions
         const margin = { top: 20, right: 80, bottom: 50, left: 60 };
         const width = 960 - margin.left - margin.right;
         const height = 400 - margin.top - margin.bottom;
     
-        // Clear previous visualization
         d3.select("#visualization").html("");
 
         const svg = d3.select("#visualization")
@@ -56,7 +54,6 @@ async function loadData() {
             .append("g")
             .attr("transform", `translate(${margin.left},${margin.top})`);
     
-        // Define scales
         const x = d3.scaleLinear()
             .domain([d3.min(gdpData, d => d.year), d3.max(gdpData, d => d.year)])
             .range([0, width]);
@@ -104,13 +101,11 @@ async function loadData() {
                 }));
         }
     
-        // Add the x-axis
         svg.append("g")
         .attr("class", "x-axis")
         .attr("transform", `translate(0,${height})`)
         .call(d3.axisBottom(x).tickFormat(d3.format("d")));
 
-        // Add the y-axis for GDP
         svg.append("g")
         .attr("class", "y-axis-left")
         .call(d3.axisLeft(yGDP))
@@ -122,7 +117,6 @@ async function loadData() {
         .attr("text-anchor", "end")
         .text("GDP");
 
-        // Add the y-axis for secondary metric
         svg.append("g")
         .attr("class", "y-axis-right")
         .attr("transform", `translate(${width},0)`)
@@ -135,7 +129,6 @@ async function loadData() {
         .attr("text-anchor", "end")
         .text(scene === 0 ? "Income" : scene === 1 ? "Life Expectancy" : "Population");
 
-        // Line generators
         const lineGDP = d3.line()
         .x(d => x(d.year))
         .y(d => yGDP(d.gdp))
@@ -150,7 +143,6 @@ async function loadData() {
         })
         .curve(d3.curveMonotoneX); 
 
-        // Add the lines
         svg.append("path")
         .datum(gdpData)
         .attr("class", "line-gdp")
@@ -181,7 +173,7 @@ async function loadData() {
                     note: { label: "From 1900 to 1960, life expectancy increased from 50 to 70, but growth to life expectancy slowed down since then", title: "Year 1960" },
                     data: { year: 1960, value: 70.1 }, 
                     dx: 50,
-                    dy: 100
+                    dy: 60
                 }
             ],
             2: [
@@ -214,7 +206,7 @@ async function loadData() {
         svg.append("g")
             .attr("class", "annotation-group")
             .call(makeAnnotations);
-        // Add interactivity and annotations
+
         const focus = svg.append("g")
             .attr("class", "focus")
             .style("display", "none");
@@ -258,7 +250,7 @@ async function loadData() {
             focus.select("text").text(`GDP: ${d.gdp}, ${scene === 0 ? "Income" : scene === 1 ? "Life Expectancy" : "Population"}: ${secondaryValue}`);
         }
     
-        // Navigation functionality
+
         const scenes = [0, 1, 2];
         let currentScene = scene;
     
