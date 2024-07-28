@@ -67,6 +67,32 @@ async function loadData() {
         } else if (scene === 2) {
             ySecondary.domain([0, d3.max(popData, d => +d.population)]).nice();
         }
+        const zoom = d3.zoom()
+            .scaleExtent([1, 10]) 
+            .translateExtent([[0, 0], [width, height]]) 
+            .extent([[0, 0], [width, height]]) 
+            .on("zoom", zoomed);
+
+            svg.call(zoom);
+
+        function zoomed(event) {
+            const transform = event.transform;
+            const newX = transform.rescaleX(x);
+            const newYGDP = transform.rescaleY(yGDP);
+
+            svg.selectAll(".x-axis").call(d3.axisBottom(newX));
+            svg.selectAll(".y-axis-left").call(d3.axisLeft(newYGDP));
+
+            svg.selectAll(".line-gdp")
+                .attr("d", lineGDP.x(d => newX(d.year)).y(d => newYGDP(d.gdp)));
+
+            svg.selectAll(".line-secondary")
+                .attr("d", lineSecondary.x(d => newX(d.year)).y(d => {
+                    if (scene === 0) return ySecondary(incomeData.find(e => e.year === d.year)?.income);
+                    if (scene === 1) return ySecondary(lexData.find(e => e.year === d.year)?.life_expectancy);
+                    if (scene === 2) return ySecondary(popData.find(e => e.year === d.year)?.population);
+                }));
+            }
     
         // Add the x-axis
         svg.append("g")
@@ -103,7 +129,7 @@ async function loadData() {
         const lineGDP = d3.line()
         .x(d => x(d.year))
         .y(d => yGDP(d.gdp))
-        .curve(d3.curveMonotoneX); // Smooth line
+        .curve(d3.curveMonotoneX); 
 
         const lineSecondary = d3.line()
         .x(d => x(d.year))
@@ -112,7 +138,7 @@ async function loadData() {
             if (scene === 1) return ySecondary(lexData.find(e => e.year === d.year)?.life_expectancy);
             if (scene === 2) return ySecondary(popData.find(e => e.year === d.year)?.population);
         })
-        .curve(d3.curveMonotoneX); // Smooth line
+        .curve(d3.curveMonotoneX); 
 
         // Add the lines
         svg.append("path")
@@ -194,31 +220,6 @@ async function loadData() {
         };
     }
     
-    const zoom = d3.zoom()
-    .scaleExtent([1, 10]) // Set the zoom scale extent
-    .translateExtent([[0, 0], [width, height]]) // Set the translation extent
-    .extent([[0, 0], [width, height]]) // Set the zoomable extent
-    .on("zoom", zoomed);
-
-    svg.call(zoom);
-
-    function zoomed(event) {
-        const transform = event.transform;
-        const newX = transform.rescaleX(x);
-        const newYGDP = transform.rescaleY(yGDP);
-
-        svg.selectAll(".x-axis").call(d3.axisBottom(newX));
-        svg.selectAll(".y-axis-left").call(d3.axisLeft(newYGDP));
-
-        svg.selectAll(".line-gdp")
-            .attr("d", lineGDP.x(d => newX(d.year)).y(d => newYGDP(d.gdp)));
-
-        svg.selectAll(".line-secondary")
-            .attr("d", lineSecondary.x(d => newX(d.year)).y(d => {
-                if (scene === 0) return ySecondary(incomeData.find(e => e.year === d.year)?.income);
-                if (scene === 1) return ySecondary(lexData.find(e => e.year === d.year)?.life_expectancy);
-                if (scene === 2) return ySecondary(popData.find(e => e.year === d.year)?.population);
-            }));
-    }
+    
 
     drawVisualization();
