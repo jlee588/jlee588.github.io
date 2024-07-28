@@ -73,26 +73,28 @@ async function loadData() {
             .extent([[0, 0], [width, height]]) 
             .on("zoom", zoomed);
 
-            svg.call(zoom);
+        svg.call(zoom);
 
         function zoomed(event) {
             const transform = event.transform;
             const newX = transform.rescaleX(x);
             const newYGDP = transform.rescaleY(yGDP);
-
+            const newYSecondary = transform.rescaleY(ySecondary);
+    
             svg.selectAll(".x-axis").call(d3.axisBottom(newX));
             svg.selectAll(".y-axis-left").call(d3.axisLeft(newYGDP));
-
+            svg.selectAll(".y-axis-right").call(d3.axisRight(newYSecondary));
+    
             svg.selectAll(".line-gdp")
                 .attr("d", lineGDP.x(d => newX(d.year)).y(d => newYGDP(d.gdp)));
-
+    
             svg.selectAll(".line-secondary")
                 .attr("d", lineSecondary.x(d => newX(d.year)).y(d => {
-                    if (scene === 0) return ySecondary(incomeData.find(e => e.year === d.year)?.income);
-                    if (scene === 1) return ySecondary(lexData.find(e => e.year === d.year)?.life_expectancy);
-                    if (scene === 2) return ySecondary(popData.find(e => e.year === d.year)?.population);
+                    if (scene === 0) return newYSecondary(incomeData.find(e => e.year === d.year)?.income);
+                    if (scene === 1) return newYSecondary(lexData.find(e => e.year === d.year)?.life_expectancy);
+                    if (scene === 2) return newYSecondary(popData.find(e => e.year === d.year)?.population);
                 }));
-            }
+        }
     
         // Add the x-axis
         svg.append("g")
